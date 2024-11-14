@@ -7,8 +7,10 @@ const { default: mongoose } = require("mongoose");
 const NoteModel = require("./note.model");
 exports.createUser = async (req, res, next) => {
   try {
-    const {name, track, gender} = req.body;
+    const {name, track, gender, email, password} = req.body;
     // data validation
+    if(!email) return next(APIError.badRequest("Email is require"))
+    if(!password) return next(APIError.badRequest("Password is require"))
     if (!name) return next(APIError.badRequest("Name is required"))
     if (!track) throw  new Error("Track is required");
     if (!gender) throw  new Error("Gender is required");

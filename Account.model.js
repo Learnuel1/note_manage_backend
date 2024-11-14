@@ -6,6 +6,20 @@ const AccountSchema = new Schema ({
     require: true,
 
   },
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    index: true
+  },
+  password: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  refreshToken:{
+    type: [],
+  },
   gender: {
     type: String,
     require: true,
