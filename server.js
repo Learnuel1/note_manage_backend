@@ -14,7 +14,7 @@ app.listen(process.env.PORT, ()=>{
     // connect("mongodb://localhost:27017/note_db");
     connect(process.env.DB_URL);
     console.log("Database connected successfully ...");
-    console.log(`Server is running on: http://localhost:${PORT}`)
+    console.log(`Server is running on: http://localhost:${process.env.PORT}`)
   } catch (error) {
     console.log(error);
     process.exit(-1);
