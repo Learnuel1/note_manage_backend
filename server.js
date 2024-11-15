@@ -12,7 +12,7 @@ app.listen(process.env.PORT, ()=>{
     console.log("Connecting to database ...");
     // connect to database
     // connect("mongodb://localhost:27017/note_db");
-    connect(process.env.DB_URL);
+    connect(process.env.LOCAL_DB_URL);
     console.log("Database connected successfully ...");
     console.log(`Server is running on: http://localhost:${process.env.PORT}`)
   } catch (error) {
