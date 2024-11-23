@@ -52,6 +52,7 @@ exports.createUser = async (req, res, next) => {
 
 exports.getAccounts = async (req, res, next) => {
   try {
+    // console.log(req.userId);
     const accounts = await AccountModel.find({}).select("-__v");
     if(!accounts || accounts.length === 0) 
       return res.status(404).json({message: "No record found"});
@@ -143,8 +144,8 @@ exports.deleteAccount = (req, res) => {
 
 exports.createNote = async (req, res, next) => {
   try {
-    const {accountId, title, text} = req.body;
-    if(!accountId) throw new Error("Account ID is require");
+    const { title, text} = req.body;
+    // if(!accountId) throw new Error("Account ID is require");
     if(!title) throw new Error("Title is require");
     if(!text) throw new Error("Text is require");
     const createdAt = Date.now;
@@ -152,7 +153,7 @@ exports.createNote = async (req, res, next) => {
       accountId,
       title,
       text,
-      account: accountId, 
+      account: req.userId, 
     }
     const userExist = await AccountModel.findById(accountId);
     if(!userExist) return next(APIError.badRequest("Invalid Account ID"));
