@@ -17,6 +17,8 @@ exports.createUser = async (req, res, next) => {
     if (!gender) throw  new Error("Gender is required");
     if (gender !== 'male' && gender !== 'female')  throw new Error("Invalid gender");
     if(password.length <8) return next(APIError.badRequest("Invalid password length"));
+    const emailExist = await AccountModel.findOne({email});
+    if(emailExist) return next(APIError.badRequest("Email already exist"));
     const hashedPassword = hashSync(password, 10);
     const newUser = {
       name,
