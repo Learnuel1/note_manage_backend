@@ -19,7 +19,7 @@ exports.login = async (req, res, next) => {
     if(!userExist) return next(APIError.notFound("Account does not exist"));
     if( !compareSync(password, userExist.password)) return next(APIError.badRequest("Incorrect password"));
     const accessToken = jwt.sign({id:userExist._id, email:userExist.email}, process.env.ACCESS_TOKEN_SECRETE, {expiresIn: "10m"});
-    const refreshToken = jwt.sign({id:userExist._id, email: userExist.email}, process.env.REFRESH_TOKEN_SECRETE, {expiresIn: "15m"})
+    const refreshToken = jwt.sign({id:userExist._id, email: userExist.email}, process.env.REFRESH_TOKEN_SECRETE, {expiresIn: "30m"})
   userExist.refreshToken = refreshToken;
   userExist.save();
   res.clearCookie("note_ap");
@@ -86,8 +86,8 @@ exports.refreshToken = async (req, res, next) => {
       return res.status(403).json({message: "Login to have access"})
       }
     })
-    const accessToken = jwt.sign({id:found._id, email:found.email}, process.env.ACCESS_TOKEN_SECRETE, {expiresIn: "5m"});
-    const newRefreshToken = jwt.sign({id:found._id, email: found.email}, process.env.REFRESH_TOKEN_SECRETE, {expiresIn: "10m"})
+    const accessToken = jwt.sign({id:found._id, email:found.email}, process.env.ACCESS_TOKEN_SECRETE, {expiresIn: "10m"});
+    const newRefreshToken = jwt.sign({id:found._id, email: found.email}, process.env.REFRESH_TOKEN_SECRETE, {expiresIn: "30m"})
   found.refreshToken = newRefreshToken;
   found.save();
   res.clearCookie("note_ap");
