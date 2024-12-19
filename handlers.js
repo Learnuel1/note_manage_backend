@@ -98,29 +98,7 @@ exports.updateAccount = async (req, res, next) => {
     // const userExist = await AccountModel.findById({id})
     const userExist = await AccountModel.findByIdAndUpdate(id, {...info}, {returnOriginal:false})
     if(!userExist) return next(APIError.notFound("User does not Exist"))
-    // check if file exist
-    // if( fs.existsSync("accounts.json")){
-    //     // read the file
-    //     let allUsers = fs.readFileSync("accounts.json", "utf-8");
-    //     if(allUsers.error) throw new Error(err);
-    //     allUsers = JSON.parse(allUsers);
-
-    //     // find a particular user to update
-    //     const userExist = allUsers.find(user => user.id === id);
-    //     if(!userExist) return res.status(404).json({message: "user does not exist"});
-    //     for(let key in info){
-    //       userExist[key] = info[key];
-    //       userExist.updatedAt = Date.now();
-    //     } 
-    //     const otherUsers = allUsers.filter(user => user.id !== id);
-    //     otherUsers.push(userExist);
-    //     // write data back to file
-    //     const result = fs.writeFileSync("accounts.json", JSON.stringify(otherUsers));
-    //     if(result) throw new Error(result);
-    //     res.status(200).json({message: "Account updated successfully"})
-    // }else{
-    //   res.status(404).json({message: "No record found"})
-    // }
+    
     res.status(200).json({message: "Account updated successfully"})
   } catch (error) {
     next(error)
@@ -146,18 +124,16 @@ exports.deleteAccount = (req, res) => {
 
 exports.createNote = async (req, res, next) => {
   try {
-    const { title, text} = req.body;
-    // if(!accountId) throw new Error("Account ID is require");
+    const { title, text} = req.body; 
     if(!title) throw new Error("Title is require");
     if(!text) throw new Error("Text is require");
     const createdAt = Date.now;
     const newNote =  {
-      accountId,
       title,
       text,
       account: req.userId, 
     }
-    const userExist = await AccountModel.findById(accountId);
+    const userExist = await AccountModel.findById(req.userId);
     if(!userExist) return next(APIError.badRequest("Invalid Account ID"));
     const createNote = await NoteModel.create({...newNote});
   res.status(200).json({message: "Note created successfully"})

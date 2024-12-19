@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors")
-const whitelist = ['http://127.0.0.1:5500']
+const whitelist = ['http://127.0.0.1:5500'];
 
 app.use(cors({
   origin: function (origin, callback) {

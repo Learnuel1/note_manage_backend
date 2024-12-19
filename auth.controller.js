@@ -18,8 +18,8 @@ exports.login = async (req, res, next) => {
     const userExist = await AccountModel.findOne({email});
     if(!userExist) return next(APIError.notFound("Account does not exist"));
     if( !compareSync(password, userExist.password)) return next(APIError.badRequest("Incorrect password"));
-    const accessToken = jwt.sign({id:userExist._id, email:userExist.email}, process.env.ACCESS_TOKEN_SECRETE, {expiresIn: "10m"});
-    const refreshToken = jwt.sign({id:userExist._id, email: userExist.email}, process.env.REFRESH_TOKEN_SECRETE, {expiresIn: "30m"})
+    const accessToken = jwt.sign({id:userExist._id, email:userExist.email}, process.env.ACCESS_TOKEN_SECRETE, {expiresIn: "1m"});
+    const refreshToken = jwt.sign({id:userExist._id, email: userExist.email}, process.env.REFRESH_TOKEN_SECRETE, {expiresIn: "2m"})
   userExist.refreshToken = refreshToken;
   userExist.save();
   res.clearCookie("note_ap");
@@ -28,7 +28,7 @@ exports.login = async (req, res, next) => {
     secure: false,
     sameSite: "none",
   })
-  res.status(200).json({message: "Login successful", accessToken, refreshToken})
+  res.status(200).json({message: "Login successful", name:userExist.name, accessToken, refreshToken})
   } catch (error) {
     next(error)
   }
@@ -45,7 +45,7 @@ exports.logout = async (req, res, next) => {
         }
         user.id = decoded.id;
         user.email = decoded.email;
-      });
+      }); 
     }
     const userExist = await AccountModel.findOne({email:user.email});
     if(!userExist) return next(APIError.notFound("Account does not exist"));
@@ -60,6 +60,7 @@ exports.logout = async (req, res, next) => {
 }
 exports.refreshToken = async (req, res, next) => {
   try {
+    console.log("refreshtoken called")
     let token = req.headers?.cookie?.split("=")[1];
     if(!token) token = req.headers?.authorization?.split(" ")[1];
     const {refreshToken} = req.body;
@@ -69,6 +70,7 @@ exports.refreshToken = async (req, res, next) => {
     if(!found){
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRETE, (err, decode)=>{
           if(err){
+            console.log(err)
             // const user = AccountModel.findOne({_id:decode.id});
             // user.refreshToken =[];
             // user.save();
@@ -78,16 +80,19 @@ exports.refreshToken = async (req, res, next) => {
         return res.status(403).json({message: "Login to have access"})
     } 
 
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRETE, (err, decode)=>{
-      if(err){
-        const user = AccountModel.findOne({_id:decode.id});
-        user.refreshToken =[];
-        user.save();
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRETE, async (err, decode)=>{
+      if(err){ 
+        const user = await AccountModel.findOne({_id:decode?.id});
+        if(user){
+          user.refreshToken =[];
+          user.save();
+        }
       return res.status(403).json({message: "Login to have access"})
-      }
+    }
+    return res.status(403).json({message: "Login to have access"})
     })
-    const accessToken = jwt.sign({id:found._id, email:found.email}, process.env.ACCESS_TOKEN_SECRETE, {expiresIn: "10m"});
-    const newRefreshToken = jwt.sign({id:found._id, email: found.email}, process.env.REFRESH_TOKEN_SECRETE, {expiresIn: "30m"})
+    const accessToken = jwt.sign({id:found._id, email:found.email}, process.env.ACCESS_TOKEN_SECRETE, {expiresIn: "1m"});
+    const newRefreshToken = jwt.sign({id:found._id, email: found.email}, process.env.REFRESH_TOKEN_SECRETE, {expiresIn: "2m"})
   found.refreshToken = newRefreshToken;
   found.save();
   res.clearCookie("note_ap");
